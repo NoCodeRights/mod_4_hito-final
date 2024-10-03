@@ -1,16 +1,22 @@
 import React, { useContext } from "react";
 import { Navbar, Nav, Button, Container } from "react-bootstrap";
 import { formatNumber } from "../scripts";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { CartContext } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
 
 function NavbarApp() {
   const { total } = useContext(CartContext);
-  const { token } = useContext(AuthContext);
+  const { token, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const setActiveClass = ({ isActive }) =>
     isActive ? "nav-link active" : "nav-link";
+
+  const handleLogout = () => {
+    logout();
+    navigate("/LoginPage");
+  };
 
   return (
     <Navbar bg="dark" data-bs-theme="dark">
@@ -33,10 +39,12 @@ function NavbarApp() {
                 </NavLink>
               </Button>
 
-              <Button className="btn-sm" variant="outline-light">
-                <NavLink to="/Logout" className={setActiveClass}>
-                  🔒Logout
-                </NavLink>
+              <Button
+                className="btn-sm"
+                variant="outline-light"
+                onClick={handleLogout}
+              >
+                🔒Logout
               </Button>
             </>
           ) : (
@@ -56,10 +64,11 @@ function NavbarApp() {
           )}
         </Nav>
 
-
         {token && (
           <Button className="btn-sm" variant="outline-info" href="#total">
-            <NavLink to="/Cart" className={setActiveClass}>🛒Total: {formatNumber(total)}</NavLink>
+            <NavLink to="/Cart" className={setActiveClass}>
+              🛒Total: {formatNumber(total)}
+            </NavLink>
           </Button>
         )}
       </Container>
