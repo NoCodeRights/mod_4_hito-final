@@ -1,81 +1,95 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 import Swal from "sweetalert2";
 
 const LoginPage = () => {
+  const { userLogin } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
 
-  const validaLogin = (e) => {
+  const validaFormulario = async (e) => {
     e.preventDefault();
     if (email.toLowerCase().trim() == "" || password.trim() == "") {
       Swal.fire({
         title: "Error!",
-        text: "Todos los campos son obligatorios",
+        text: "Todos los campos deben ser completados",
         icon: "error",
         confirmButtonText: "Cerrar",
       });
-      navigate("/RegisterPage");
+      navigate("/registerPage");
     } else {
       if (password.length >= 6) {
-        Swal.fire({
-          title: "Confirmado",
-          text: "Haz iniciado sesión correctamente",
-          icon: "success",
-          confirmButtonText: "Cerrar",
-        });
-        return(true);
-        navigate("/Profile")
+        const user = await authUser();
+        if (user) {
+          Swal.fire({
+            title: "Success!",
+            text: "Haz iniciado sesión correctamente",
+            icon: "success",
+            confirmButtonText: "Cerrar",
+          });
+          navigate("/Profile");
+        }
       } else {
         Swal.fire({
           title: "Error!",
-          text: "La contraseña debe tener al menos 6 caracteres",
+          text: "el password debe ser superior 6 caracteres",
           icon: "error",
           confirmButtonText: "Cerrar",
         });
-        navigate("/RegisterPage");
+        navigate("/registerPage");
       }
     }
 
     setEmail("");
     setPassword("");
   };
+
+  const authUser = async () => {
+    return userLogin(email, password);
+  };
+
   return (
     <>
       <div className="d-flex justify-content-center align-items-center">
         <div
-          style={{ width: "75rem" }}
-          className="d-flex justify-content-center flex-column align-items-center"
+          style={{ width: "25rem" }}
+          className="d-flex justify-content-center flex-column align-items-center border border-3 border-warning-subtle rounded-3 gap-3 mt-3 mb-3 pt-3 pb-3"
         >
           <h1>Inicio de sesión</h1>
           <div>
-            <form onSubmit={(e) => validaLogin(e)}>
-              <div>
-                <label className="form-label">Correo electrónico</label>
+            <form onSubmit={(e) => validaFormulario(e)}>
+              <div className="mb-3">
+                <label htmlFor="exampleInputEmail1" className="form-label">
+                  Correo electrónico
+                </label>
                 <input
                   type="email"
                   className="form-control"
                   id="email"
-                  placeholder="Tu Correo"
+                  aria-describedby="emailHelp"
+                  placeholder="Ingresa tu email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              <div>
-                <label className="form-label">Contraseña</label>
+              <div className="mb-3">
+                <label htmlFor="exampleInputPassword1" className="form-label">
+                  Contraseña
+                </label>
                 <input
                   type="password"
                   className="form-control"
                   id="pass"
-                  placeholder="Contraseña"
+                  placeholder="Ingresa tu contraseña"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
               <div className="d-flex justify-content-center">
-                <button type="submit" className="btn btn-primary m-2">
+                <button type="submit" className="btn btn-dark">
                   Enviar
                 </button>
               </div>
